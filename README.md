@@ -22,7 +22,7 @@ SJTU CS1951 课程大作业
 本作业占本课程总成绩 15%，其中 B+ 树占 7%，管理系统占 8%。
 
 - B+ 树: 7%
-  - OJ 测试: 80%
+  - OJ 测试（仅题 [3091](https://acm.sjtu.edu.cn/OnlineJudge/problem/3091)，不含压力测试）: 80%
   - Code Review: 20%
 
 bonus 另外计算，计入平时分总分，且不超过总分的 1%。
