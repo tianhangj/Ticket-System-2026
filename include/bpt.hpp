@@ -18,6 +18,7 @@ private:
     std::fstream file;
     const static size_t BUFFER_SIZE = 4096;
     char *buf;
+    const char* filename_;
     template<class T>
     void read(T &data, size_t pos) {
         file.seekg(pos);
@@ -112,7 +113,8 @@ private:
         node.size++;
     }
 public:
-    BPT(const char* filename) {
+    void initialize(const char* filename) {
+        filename_ = filename;
         buf = static_cast<char*>(malloc(BUFFER_SIZE));
         file.rdbuf()->pubsetbuf(buf, BUFFER_SIZE);
         if (std::filesystem::exists(filename)) {
@@ -130,9 +132,34 @@ public:
             file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
         }
     }
-    ~BPT() {
+    void clear() {
         file.close();
-        free(buf);
+        file.open(filename_, std::ios::out | std::ios::binary | std::ios::trunc);
+        metadata.root = sizeof(Metadata);
+        write(metadata, 0);
+        Node root;
+        root.is_leaf = true;
+        root.size = 0;
+        write(root, metadata.root);
+        file.close();
+        file.open(filename_, std::ios::in | std::ios::out | std::ios::binary);
+    }
+    void close() {
+        if (file.is_open()) {
+            file.close();
+            free(buf);
+            buf = nullptr;
+        }
+    }
+    BPT() {
+    }
+    ~BPT() {
+        close();
+    }
+    bool empty() {
+        Node node;
+        read(node, metadata.root);
+        return node.size == 0;
     }
     std::vector<V> find(const K &key) {
         std::vector<V> result;
