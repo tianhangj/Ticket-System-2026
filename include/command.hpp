@@ -19,6 +19,9 @@ struct Command {
         }
         return cmd;
     }
+    bool has(char arg) const {
+        return args.count(arg);
+    }
     int geti(char arg) const {
         assert(args.count(arg));
         int result = 0;
