@@ -47,4 +47,10 @@ struct String {
     }
 };
 
+template <size_t N>
+std::ostream& operator << (std::ostream& os, const String<N>& str) {
+    os << str.data;
+    return os;
+}
+
 #endif
