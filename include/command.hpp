@@ -36,6 +36,17 @@ struct Command {
         assert(args.count(arg));
         return split(args[arg], '|');
     }
+    sjtu::vector<int> getli(char arg) const {
+        assert(args.count(arg));
+        sjtu::vector<std::string> tokens = split(args[arg], '|');
+        sjtu::vector<int> result;
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            int x;
+            sscanf(tokens[i].c_str(), "%d", &x);
+            result.push_back(x);
+        }
+        return result;
+    }
 };
 
 #endif
