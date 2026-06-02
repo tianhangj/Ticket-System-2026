@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 
-#include <vector>
+#include <STLite/vector.hpp>
 #include <cassert>
 
 template <class K, class V>
@@ -161,8 +161,8 @@ public:
         read(node, metadata.root);
         return node.size == 0;
     }
-    std::vector<V> find(const K &key) {
-        std::vector<V> result;
+    sjtu::vector<V> find(const K &key) {
+        sjtu::vector<V> result;
         Node node;
         read(node, metadata.root);
         if (node.size == 0) {
@@ -193,9 +193,9 @@ public:
         return result;
     }
     void insert(const K &key, const V &value) {
-        std::vector<Node>path;
-        std::vector<size_t>idx;
-        std::vector<size_t>pos;
+        sjtu::vector<Node>path;
+        sjtu::vector<size_t>idx;
+        sjtu::vector<size_t>pos;
         path.emplace_back();
         read(path.back(), metadata.root);
         pos.emplace_back(metadata.root);
@@ -286,9 +286,9 @@ public:
         }
     }
     void erase(const K &key, const V &value) {
-        std::vector<Node>path;
-        std::vector<size_t>idx;
-        std::vector<size_t>pos;
+        sjtu::vector<Node>path;
+        sjtu::vector<size_t>idx;
+        sjtu::vector<size_t>pos;
         path.emplace_back();
         read(path.back(), metadata.root);
         pos.emplace_back(metadata.root);

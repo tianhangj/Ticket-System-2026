@@ -520,6 +520,15 @@ public:
 		_data[_size] = value;
 		++_size;
 	}
+
+	template <class... Args>
+	void emplace_back(Args&&... args) {
+		if (_size == _capacity) {
+			_expend_capacity();
+		}
+		new (_data + _size) T(std::forward<Args>(args)...);
+		++_size;
+	}
 	/**
 	 * remove the last element from the end.
 	 * throw container_is_empty if size() == 0
