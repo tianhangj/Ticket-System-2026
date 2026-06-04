@@ -76,6 +76,7 @@ void release_train(DataManager& data_manager, const Command& cmd) {
             ticket_info.to = trains[0].stations[j];
             data_manager.ticket_data.insert(ticket_info, trains[0].trainID);
         }
+        data_manager.station_data.insert(trains[0].stations[i], trains[0].trainID);
     }
     return;
 }
