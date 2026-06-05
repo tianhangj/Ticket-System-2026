@@ -54,6 +54,7 @@ struct TicketInfo {
 
 struct WaitInfo {
     int time;
+    String<20> user;
     String<20> trainid;
     int date; // 从起点站发车的日期
     String<30> from, to;
