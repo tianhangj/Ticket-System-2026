@@ -463,7 +463,6 @@ template<
     _header.son[1] = &_header;
     _header.color = black;
     _size = 0;
-    std::cerr << "init: " << &_header << " " << _header.son[0] << " " << _header.son[1] << "\n";
   }
 
   map(const map &other) {
