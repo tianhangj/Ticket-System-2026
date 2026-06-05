@@ -42,6 +42,17 @@ struct String {
         }
         return true;
     }
+    bool operator != (const String& other) const {
+        for (size_t i = 0; i < N; i++) {
+            if (data[i] != other.data[i]) {
+                return true;
+            }
+            if (data[i] == '\0') {
+                break;
+            }
+        }
+        return false;
+    }
     bool operator < (const String& other) const {
         return std::strcmp(data, other.data) < 0;
     }
