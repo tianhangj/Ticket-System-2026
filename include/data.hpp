@@ -58,6 +58,7 @@ struct WaitInfo {
     String<20> trainid;
     int date; // 从起点站发车的日期
     String<30> from, to;
+    int f, t; // index of from, to
     int num;
     bool operator < (const WaitInfo &rhs) const {
         return time < rhs.time;
@@ -69,6 +70,7 @@ struct OrderInfo {
     int status; // 0: success, 1: pending, 2: refuneded
     String<20> trainid;
     String<30> from, to;
+    int f, t; // index of from, to
     int date; // 从起点站发车的日期
     int leaving_time, arriving_time;
     int price;

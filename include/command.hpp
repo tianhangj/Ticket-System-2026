@@ -19,6 +19,11 @@ struct Command {
         }
         return cmd;
     }
+    int timestamp() const {
+        int res;
+        sscanf(time_stamp.c_str(), "\\[%d\\]", &res);
+        return res;
+    }
     bool has(char arg) const {
         return args.count(arg);
     }
