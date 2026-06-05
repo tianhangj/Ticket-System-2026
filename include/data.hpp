@@ -66,7 +66,7 @@ struct WaitInfo {
 
 struct OrderInfo {
     int time;
-    int status; // 0: pending, 1:success, 2:refuneded
+    int status; // 0: success, 1: pending, 2: refuneded
     String<20> trainid;
     String<30> from, to;
     int date; // 从起点站发车的日期
