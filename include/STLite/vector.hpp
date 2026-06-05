@@ -399,6 +399,12 @@ public:
 		}
 		return _data[_size-1];
 	}
+	T & back() {
+		if (_size == 0) {
+			throw container_is_empty();
+		}
+		return _data[_size-1];
+	}
 	/**
 	 * returns an iterator to the beginning.
 	 */
@@ -517,7 +523,7 @@ public:
 		if (_size == _capacity) {
 			_expend_capacity();
 		}
-		_data[_size] = value;
+		new (_data + _size) T(value);
 		++_size;
 	}
 
@@ -526,7 +532,7 @@ public:
 		if (_size == _capacity) {
 			_expend_capacity();
 		}
-		new (_data + _size) T(std::forward<Args>(args)...);
+		new (_data + _size) T(args...);
 		++_size;
 	}
 	/**
