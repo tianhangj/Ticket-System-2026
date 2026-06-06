@@ -310,7 +310,6 @@ public:
         bool to_erase = true;
         for (int i = path.size()-1; i >= 1 && to_erase; --i) {
             if (path[i].size > M / 2) {
-                // std::cerr << "erase from node with size > M/2\n";
                 for (int j = _idx; j < path[i].size - 1; ++j) {
                     path[i].val[j] = path[i].val[j+1];
                     path[i].child[j] = path[i].child[j+1];
@@ -338,7 +337,6 @@ public:
                 if (idx[i-1] > 0) {
                     read(sibling[0], path[i-1].child[idx[i-1]-1]);
                     if (sibling[0].size > M / 2) {
-                        // std::cerr << "borrow from left sibling\n";
                         for (int j = path[i].size; j > 0; --j) {
                             path[i].val[j] = path[i].val[j-1];
                             path[i].child[j] = path[i].child[j-1];
@@ -367,7 +365,6 @@ public:
                 if (idx[i-1] < path[i-1].size - 1) {
                     read(sibling[1], path[i-1].child[idx[i-1]+1]);
                     if (sibling[1].size > M / 2) {
-                        // std::cerr << "borrow from right sibling\n";
                         path[i].val[path[i].size] = sibling[1].val[0];
                         path[i].child[path[i].size] = sibling[1].child[0];
                         for (int j = 1; j < sibling[1].size; ++j) {
@@ -394,7 +391,6 @@ public:
                 }
                 // merge
                 if (idx[i-1] > 0) {
-                    // std::cerr << "merge with left sibling\n";
                     for (int j = 0; j < path[i].size; ++j) {
                         sibling[0].val[sibling[0].size + j] = path[i].val[j];
                         sibling[0].child[sibling[0].size + j] = path[i].child[j];
@@ -407,7 +403,6 @@ public:
                     to_erase = true;
                     continue;
                 } else {
-                    // std::cerr << "merge with right sibling\n";
                     for (int j = 0; j < sibling[1].size; ++j) {
                         path[i].val[path[i].size + j] = sibling[1].val[j];
                         path[i].child[path[i].size + j] = sibling[1].child[j];
@@ -423,7 +418,6 @@ public:
             }
         }
         if (to_erase) {
-            // std::cerr << "erase from root\n";
             for (int j = _idx; j < path[0].size - 1; ++j) {
                 path[0].val[j] = path[0].val[j+1];
                 path[0].child[j] = path[0].child[j+1];

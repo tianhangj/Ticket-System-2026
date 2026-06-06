@@ -11,7 +11,7 @@ void query_ticket(DataManager& data_manager, const Command& cmd) {
     TicketInfo ticket_info;
     ticket_info.from = from;
     ticket_info.to = to;
-    auto trainids = data_manager.ticket_data.find(ticket_info);
+    auto train_idxs = data_manager.ticket_idx.find(ticket_info);
     
     int date = day(cmd.gets('d'));
     struct Ticket {
@@ -29,32 +29,31 @@ void query_ticket(DataManager& data_manager, const Command& cmd) {
     };
     sjtu::priority_queue<Ticket> pq;
     Ticket ticket;
-    for (const auto& trainid : trainids) {
-        auto train = data_manager.train_data.find(trainid)[0];
-        int s, t;
+    TrainInfo train;
+    for (const int& train_idx : train_idxs) {
+        data_manager.train_data.read(train, train_idx);
+        int f, t;
         for (int i = 0; i < train.station_num; ++i) {
             if (train.stations[i] == from) {
-                s = i;
+                f = i;
             }
             if (train.stations[i] == to) {
                 t = i;
             }
         }
-        int start_date = date - train.leave_times[s] / (24*60);
+        int start_date = date - train.leave_times[f] / (24*60);
         if (train.sale_date[0] <= start_date && start_date <= train.sale_date[1]) {
-            ticket.train_id = trainid;
-            ticket.leaving_time = train.leave_times[s] + start_date * 24*60;
+            ticket.train_id = train.trainid;
+            ticket.leaving_time = train.leave_times[f] + start_date * 24*60;
             ticket.arriving_time = train.arrive_times[t] + start_date * 24*60;
             ticket.seat_num = 1e9;
             ticket.price = 0;
-            for (int i = s; i < t; ++i) {
+            for (int i = f; i < t; ++i) {
                 ticket.seat_num = std::min(ticket.seat_num, train.seat_num[start_date][i]);
                 ticket.price += train.prices[i];
             }
             ticket.key = sortkey ? ticket.price : (ticket.arriving_time - ticket.leaving_time);
-            if (ticket.seat_num > 0) {
-                pq.push(ticket);
-            }
+            pq.push(ticket);
         }
     }
     std::cout << cmd.time_stamp << " " << pq.size() << "\n";
@@ -72,8 +71,8 @@ void query_transfer(DataManager& data_manager, const Command& cmd) {
     auto from = cmd.gets('s');
     auto to = cmd.gets('t');
     int date = day(cmd.gets('d'));
-    bool sortkey = false; // false: time, true: price
-    if (cmd.has('p') && cmd.gets('p') == "price") {
+    bool sortkey = false; // false: time, true: cost
+    if (cmd.has('p') && cmd.gets('p') == "cost") {
         sortkey = true;
     }
     struct Ticket {
@@ -83,15 +82,16 @@ void query_transfer(DataManager& data_manager, const Command& cmd) {
         int price, seat;
     };
     sjtu::map<String<30>, sjtu::vector<Ticket>>first;
-    auto train1 = data_manager.station_data.find(from);
-    auto train2 = data_manager.station_data.find(to);
-    for (const auto &trainid: train1) {
+    auto train_idx1 = data_manager.station_idx.find(from);
+    auto train_idx2 = data_manager.station_idx.find(to);
+    TrainInfo train;
+    for (const int &trainidx: train_idx1) {
+        data_manager.train_data.read(train, trainidx);
         Ticket ticket;
-        ticket.trainid = trainid;
+        ticket.trainid = train.trainid;
         ticket.from = from;
         ticket.seat = 1e9;
         ticket.price = 0;
-        auto train = data_manager.train_data.find(trainid)[0];
         bool flag = false;
         int start_date = 0;
         for (int i = 0; i < train.station_num; ++i) {
@@ -139,8 +139,8 @@ void query_transfer(DataManager& data_manager, const Command& cmd) {
     } minimum;
     minimum.key1 = minimum.key2 = 1e9;
     Ticket A, B;
-    for (const auto &trainid: train2) {
-        auto train = data_manager.train_data.find(trainid)[0];
+    for (const auto &trainidx: train_idx2) {
+        data_manager.train_data.read(train, trainidx);
         int to_station = 0;
         for (int i = 0; i < train.station_num; ++i) {
             if (train.stations[i] == to) {
@@ -151,7 +151,7 @@ void query_transfer(DataManager& data_manager, const Command& cmd) {
         for (int i = 0; i < to_station; ++i) {
             if (first.count(train.stations[i])) {
                 for (const auto &fir: first[train.stations[i]]) {
-                    if (fir.trainid == trainid) {
+                    if (fir.trainid == train.trainid) {
                         continue;
                     }
                     for (int d = train.sale_date[0]; d <= train.sale_date[1]; ++d) {
@@ -175,11 +175,11 @@ void query_transfer(DataManager& data_manager, const Command& cmd) {
                                 std::swap(key.key1, key.key2);
                             }
                             key.id1 = fir.trainid;
-                            key.id2 = trainid;
+                            key.id2 = train.trainid;
                             if (key < minimum) {
                                 minimum = key;
                                 A = fir;
-                                B.trainid = trainid;
+                                B.trainid = train.trainid;
                                 B.arriving_time = train.arrive_times[to_station] + d * 24*60;
                                 B.leaving_time = train.leave_times[i] + d * 24*60;
                                 B.from = train.stations[i];
@@ -221,12 +221,17 @@ void buy_ticket(DataManager& data_manager, const Command& cmd) {
     auto from = cmd.gets('f');
     auto to = cmd.gets('t');
     int n = cmd.geti('n');
-    auto trains = data_manager.train_data.find(trainid);
-    if (trains.empty()) {
+    auto train_idxs = data_manager.train_idx.find(trainid);
+    if (train_idxs.empty()) {
         std::cout << cmd.time_stamp << " -1\n";
         return;
     }
-    auto train = trains[0];
+    TrainInfo train;
+    data_manager.train_data.read(train, train_idxs[0]);
+    if (!train.released || n > train.total_seat) {
+        std::cout << cmd.time_stamp << " -1\n";
+        return;
+    }
     int f = -1, t = -1;
     int price = 0, seat = 1e9;
     for (int i = 0; i < train.station_num; ++i) {
@@ -265,11 +270,10 @@ void buy_ticket(DataManager& data_manager, const Command& cmd) {
     orderinfo.price = price;
     orderinfo.num = n;
     if (n <= seat) {
-        data_manager.train_data.erase(trainid, train);
         for (int i = f; i < t; ++i) {
             train.seat_num[date][i] -= n;
         }
-        data_manager.train_data.insert(trainid, train);
+        data_manager.train_data.update(train, train_idxs[0]);
         orderinfo.status = 0;
         data_manager.order_list.insert(user, orderinfo);
         std::cout << cmd.time_stamp << " " << n * orderinfo.price << "\n";
@@ -341,9 +345,10 @@ void refund_ticket(DataManager& data_manager, const Command& cmd) {
     data_manager.order_list.erase(user, order);
     order.status = 2;
     data_manager.order_list.insert(user, order);
-    auto train = data_manager.train_data.find(order.trainid)[0];
-    data_manager.train_data.erase(train.trainID, train);
-    auto queue = data_manager.wait_list.find(train.trainID);
+    int train_idx = data_manager.train_idx.find(order.trainid)[0];
+    TrainInfo train;
+    data_manager.train_data.read(train, train_idx);
+    auto queue = data_manager.wait_list.find(train.trainid);
     for (int i = order.f; i < order.t; ++i) {
         train.seat_num[order.date][i] += order.num;
     }
@@ -359,7 +364,7 @@ void refund_ticket(DataManager& data_manager, const Command& cmd) {
             }
         }
         if (flag) {
-            data_manager.wait_list.erase(train.trainID, wait);
+            data_manager.wait_list.erase(train.trainid, wait);
             for (int i = wait.f; i < wait.t; ++i) {
                 train.seat_num[wait.date][i] -= wait.num;
             }
@@ -374,6 +379,6 @@ void refund_ticket(DataManager& data_manager, const Command& cmd) {
             }
         }
     }
-    data_manager.train_data.insert(train.trainID, train);
+    data_manager.train_data.update(train, train_idx);
     std::cout << cmd.time_stamp << " 0\n";
 }

@@ -1,8 +1,9 @@
 #ifndef _DATA_HPP_
 #define _DATA_HPP_
 
-#include "string.hpp"
 #include "bpt.hpp"
+#include "string.hpp"
+#include "memoryriver.hpp"
 #include "STLite/map.hpp"
 
 struct UserInfo {
@@ -23,24 +24,25 @@ struct UserInfo {
 };
 
 struct TrainInfo {
-    String<20> trainID;
+    String<20> trainid;
     int station_num;
     String<30> stations[100];
     int arrive_times[100], leave_times[100];
     int seat_num[100][99];
+    int total_seat;
     int prices[99];
     int start_time;
     int sale_date[2];
     char type;
     bool released;
     bool operator < (const TrainInfo& other) const {
-        return trainID < other.trainID;
+        return trainid < other.trainid;
     }
     bool operator == (const TrainInfo& other) const {
-        return trainID == other.trainID;
+        return trainid == other.trainid;
     }
     bool operator != (const TrainInfo& other) const {
-        return trainID != other.trainID;
+        return trainid != other.trainid;
     }
 };
 
@@ -106,33 +108,36 @@ public:
     DataManager() {
     }
     BPT<String<20>, UserInfo> user_data;
-    BPT<String<20>, TrainInfo> train_data;
-    BPT<TicketInfo, String<20>> ticket_data; // (from, to) -> trainID
-    BPT<String<30>, String<20>> station_data; // station -> trainID
+    MemoryRiver<TrainInfo> train_data;
+    BPT<String<20>, int> train_idx;
+    BPT<TicketInfo, int> ticket_idx; // (from, to) -> train_idx
+    BPT<String<30>, int> station_idx; // station -> train_idx
     BPT<String<20>, WaitInfo> wait_list;
     BPT<String<20>, OrderInfo> order_list;
     sjtu::map<String<20>, int> login_status; // username -> privilege
     void initailize() {
         user_data.initialize("user.db");
-        train_data.initialize("train.db");
-        ticket_data.initialize("ticket.db");
-        station_data.initialize("station.db");
+        train_data.initialize("train.dat");
+        train_idx.initialize("train.db");
+        ticket_idx.initialize("ticket.db");
+        station_idx.initialize("station.db");
         wait_list.initialize("waitlist.db");
         order_list.initialize("order.db");
     }
     void close() {
         user_data.close();
         train_data.close();
-        ticket_data.close();
-        station_data.close();
+        ticket_idx.close();
+        station_idx.close();
         wait_list.close();
         order_list.close();
     }
     void clear() {
         user_data.clear();
         train_data.clear();
-        ticket_data.clear();
-        station_data.clear();
+        train_idx.clear();
+        ticket_idx.clear();
+        station_idx.clear();
         wait_list.clear();
         order_list.clear();
     }

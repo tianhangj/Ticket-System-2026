@@ -179,7 +179,6 @@ template<
   void fix_insert(BaseNode *node) {
     BaseNode *p;
     while (is_red(p = node->father)) {
-      // std::cerr << node << " " << node->father << " " << (node->father == &_header) << "\n";
       BaseNode *g = p->father;
       bool p_dir = (p == g->son[1]);
       BaseNode *u = g->son[!p_dir];
@@ -614,8 +613,6 @@ template<
    */
   pair<iterator, bool> insert(const value_type &value) {
     _find_result res = _find(value.first);
-    // std::cerr << "insert: " << std::endl;
-    // std::cerr << node << " " << fa << std::endl;
     if (res.node != nullptr) {
       return {iterator(this, res.node), false};
     }

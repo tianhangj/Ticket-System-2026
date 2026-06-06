@@ -102,7 +102,7 @@ void modify_profile(DataManager& data_manager, const Command& cmd) {
             user_info.mail = cmd.gets('m');
         }
         if (cmd.has('g')) {
-            if (cur_user != username && (data_manager.login_status[cur_user] <= cmd.geti('g'))) {
+            if (data_manager.login_status[cur_user] <= cmd.geti('g')) {
                 std::cout << cmd.time_stamp << " -1\n";
                 return;
             }
