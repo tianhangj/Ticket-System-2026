@@ -10,10 +10,8 @@
 #include <STLite/vector.hpp>
 #include <cassert>
 
-template <class K, class V>
+template <class K, class V, size_t M>
 class BPT {
-public:
-    const static size_t M = 20;
 private:
     std::fstream file;
     const static size_t BUFFER_SIZE = 4096;

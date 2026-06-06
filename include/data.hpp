@@ -106,13 +106,13 @@ class DataManager {
 public:
     DataManager() {
     }
-    BPT<String<20>, UserInfo> user_data;
+    BPT<String<20>, UserInfo, 32> user_data;
     MemoryRiver<TrainInfo> train_data;
-    BPT<String<20>, int> train_idx;
-    BPT<TicketInfo, int> ticket_idx; // (from, to) -> train_idx
-    BPT<String<30>, int> station_idx; // station -> train_idx
-    BPT<String<20>, WaitInfo> wait_list;
-    BPT<String<20>, OrderInfo> order_list;
+    BPT<String<20>, int, 128> train_idx;
+    BPT<TicketInfo, int, 256> ticket_idx; // (from, to) -> train_idx
+    BPT<String<30>, int, 128> station_idx; // station -> train_idx
+    BPT<String<20>, WaitInfo, 32> wait_list;
+    BPT<String<20>, OrderInfo, 32> order_list;
     sjtu::map<String<20>, int> login_status; // username -> privilege
     void initailize() {
         user_data.initialize("user.db");
