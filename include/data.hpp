@@ -26,9 +26,9 @@ struct UserInfo {
 struct TrainInfo {
     String<20> trainid;
     int station_num;
-    String<30> stations[100];
+    String<30> stations[35];
     int arrive_times[100], leave_times[100];
-    int seat_num[100][99];
+    int seat_num[100][35];
     int total_seat;
     int prices[99];
     int start_time;
