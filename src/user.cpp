@@ -69,7 +69,7 @@ void query_profile(DataManager& data_manager, const Command& cmd) {
         return;
     }
     if (cur_user == username || data_manager.login_status[cur_user] > users[0].privilege) {
-        std::cout << cmd.time_stamp << " 0 " << users[0].username << " "
+        std::cout << cmd.time_stamp << " " << users[0].username << " "
                   << users[0].name << " " << users[0].mail << " "
                   << users[0].privilege << "\n";
     } else {
@@ -102,7 +102,7 @@ void modify_profile(DataManager& data_manager, const Command& cmd) {
             user_info.mail = cmd.gets('m');
         }
         if (cmd.has('g')) {
-            if (cur_user == username || data_manager.login_status[cur_user] > cmd.geti('g')) {
+            if (cur_user != username && (data_manager.login_status[cur_user] <= cmd.geti('g'))) {
                 std::cout << cmd.time_stamp << " -1\n";
                 return;
             }

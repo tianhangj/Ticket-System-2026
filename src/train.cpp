@@ -13,8 +13,8 @@ void add_train(DataManager& data_manager, const Command& cmd) {
     train_info.sale_date[0] = day(sale_date[0]);
     train_info.sale_date[1] = day(sale_date[1]);
     int seat_num = cmd.geti('m');
-    for (int i = 0; i < train_info.station_num - 1; ++i) {
-        for (int j = 0; j <= train_info.sale_date[1] - train_info.sale_date[0]; ++j) {
+    for (int i = train_info.sale_date[0]; i <= train_info.sale_date[1]; ++i) {
+        for (int j = 0; j < train_info.station_num - 1; ++j) {
             train_info.seat_num[i][j] = seat_num;
         }
     }
@@ -32,7 +32,7 @@ void add_train(DataManager& data_manager, const Command& cmd) {
     auto stopover_times = cmd.getli('o');
     for (int i = 0; i < train_info.station_num; ++i) {
         if (i == 0) {
-            train_info.leave_times[i] = 0;
+            train_info.leave_times[i] = train_info.start_time;
         } else if (i == train_info.station_num - 1) {
             train_info.arrive_times[i] = train_info.leave_times[i-1] + travel_times[i-1];
         } else {
@@ -83,7 +83,7 @@ void release_train(DataManager& data_manager, const Command& cmd) {
 
 void query_train(DataManager& data_manager, const Command& cmd) {
     auto trains = data_manager.train_data.find(cmd.gets('i'));
-    if (trains.empty() || !trains[0].released) {
+    if (trains.empty()) {
         std::cout << cmd.time_stamp << " -1" << std::endl;
         return;
     }
@@ -93,24 +93,27 @@ void query_train(DataManager& data_manager, const Command& cmd) {
         return;
     }
     const auto& train_info = trains[0];
-    std::cout << cmd.time_stamp << " " << train_info.trainID << " " << train_info.type << " ";
-    int start_time = train_info.start_time + d * 24 * 60;
+    std::cout << cmd.time_stamp << " " << train_info.trainID << " " << train_info.type << "\n";
+    int cost = 0;
     for (int i = 0; i < train_info.station_num; ++i) {
         std::cout << train_info.stations[i] << " ";
         if (i == 0) {
             std::cout << "xx-xx xx:xx";
         } else {
-            std::cout << timestr(train_info.arrive_times[i] + start_time);
+            std::cout << timestr(train_info.arrive_times[i] + d * 24*60);
         }
         std::cout << " -> ";
         if (i == train_info.station_num - 1) {
             std::cout << "xx-xx xx:xx";
         } else {
-            std::cout << timestr(train_info.leave_times[i] + start_time);
+            std::cout << timestr(train_info.leave_times[i] + d * 24*60);
         }
-        std::cout << " " << train_info.prices[i] << " ";
+        std::cout << " " << cost << " ";
+        if (i != train_info.station_num-1) {
+            cost += train_info.prices[i];
+        }
         if (i != train_info.station_num - 1) {
-            std::cout << train_info.seat_num[d-train_info.sale_date[0]][i] << "\n";
+            std::cout << train_info.seat_num[d][i] << "\n";
         } else {
             std::cout << "x\n";
         }

@@ -20,8 +20,9 @@ struct Command {
         return cmd;
     }
     int timestamp() const {
-        int res;
-        sscanf(time_stamp.c_str(), "\\[%d\\]", &res);
+        int res = -1;
+        sscanf(time_stamp.c_str() + 1, "%d", &res);
+        assert(res != -1);
         return res;
     }
     bool has(char arg) const {

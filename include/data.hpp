@@ -11,11 +11,14 @@ struct UserInfo {
     String<15> name;
     String<30> mail;
     int privilege;
-    bool operator<(const UserInfo& other) const {
+    bool operator < (const UserInfo& other) const {
         return username < other.username;
     }
-    bool operator==(const UserInfo& other) const {
+    bool operator == (const UserInfo& other) const {
         return username == other.username;
+    }
+    bool operator != (const UserInfo& other) const {
+        return username != other.username;
     }
 };
 
@@ -30,11 +33,14 @@ struct TrainInfo {
     int sale_date[2];
     char type;
     bool released;
-    bool operator<(const TrainInfo& other) const {
+    bool operator < (const TrainInfo& other) const {
         return trainID < other.trainID;
     }
-    bool operator==(const TrainInfo& other) const {
+    bool operator == (const TrainInfo& other) const {
         return trainID == other.trainID;
+    }
+    bool operator != (const TrainInfo& other) const {
+        return trainID != other.trainID;
     }
 };
 
@@ -50,6 +56,9 @@ struct TicketInfo {
     bool operator == (const TicketInfo& other) const {
         return from == other.from && to == other.to;
     }
+    bool operator != (const TicketInfo& other) const {
+        return from != other.from || to != other.to;
+    }
 };
 
 struct WaitInfo {
@@ -62,6 +71,12 @@ struct WaitInfo {
     int num;
     bool operator < (const WaitInfo &rhs) const {
         return time < rhs.time;
+    }
+    bool operator == (const WaitInfo &rhs) const {
+        return time == rhs.time;
+    }
+    bool operator != (const WaitInfo &rhs) const {
+        return time != rhs.time;
     }
 };
 
@@ -76,7 +91,13 @@ struct OrderInfo {
     int price;
     int num;
     bool operator < (const OrderInfo &rhs) const {
-        return time < rhs.time;
+        return time > rhs.time;
+    }
+    bool operator == (const OrderInfo &rhs) const {
+        return time == rhs.time;
+    }
+    bool operator != (const OrderInfo &rhs) const {
+        return time != rhs.time;
     }
 };
 
