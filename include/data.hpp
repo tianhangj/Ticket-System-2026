@@ -47,8 +47,7 @@ struct TrainInfo {
 };
 
 struct TicketInfo {
-    String<30> from;
-    String<30> to;
+    size_t from, to; // hash
     bool operator < (const TicketInfo& other) const {
         if (from == other.from) {
             return to < other.to;

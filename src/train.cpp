@@ -85,8 +85,8 @@ void release_train(DataManager& data_manager, const Command& cmd) {
     for (int i = 0; i < train.station_num - 1; ++i) {
         for (int j = i+1; j < train.station_num; ++j) {
             TicketInfo ticket_info;
-            ticket_info.from = train.stations[i];
-            ticket_info.to = train.stations[j];
+            ticket_info.from = train.stations[i].hash();
+            ticket_info.to = train.stations[j].hash();
             data_manager.ticket_idx.insert(ticket_info, train_idxs[0]);
         }
     }

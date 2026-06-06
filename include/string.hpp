@@ -6,6 +6,8 @@
 #include <cstring>
 #include <string>
 
+const size_t p = 17, mod = 100000000000000379;
+
 // N is the maximum size of the string, not including the '\0' character
 template <size_t N>
 struct String {
@@ -55,6 +57,13 @@ struct String {
     }
     bool operator < (const String& other) const {
         return std::strcmp(data, other.data) < 0;
+    }
+    size_t hash() {
+        size_t ret = 0;
+        for (int i = 0; data[i]; ++i) {
+            ret = (ret * p + data[i]) % mod;
+        }
+        return ret;
     }
 };
 

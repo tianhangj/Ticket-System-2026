@@ -9,8 +9,8 @@ void query_ticket(DataManager& data_manager, const Command& cmd) {
     }
 
     TicketInfo ticket_info;
-    ticket_info.from = from;
-    ticket_info.to = to;
+    ticket_info.from = String<30>(from).hash();
+    ticket_info.to = String<30>(to).hash();
     auto train_idxs = data_manager.ticket_idx.find(ticket_info);
     
     int date = day(cmd.gets('d'));
